@@ -24,7 +24,7 @@ from src.voice_lab.application.evaluation_service import (
 )
 from src.voice_lab.application.generation_service import GenerationService
 from src.voice_lab.domain.contracts import AudioEvaluator
-from src.voice_lab.domain.models import AcquisitionStatus
+from src.voice_lab.domain.models import AcquisitionStatus, DiscoveryCatalog
 from src.voice_lab.domain.profiles import ProfileManager
 from src.voice_lab.infrastructure.audio.storage import LocalAudioStorage
 from src.voice_lab.infrastructure.config.settings import settings
@@ -169,21 +169,42 @@ class VoiceLabApp:
             choices.append((display, sec.id))
         return choices
 
+    def _get_section_and_descendant_ids(self, section_id: str, catalog: DiscoveryCatalog) -> set[str]:
+        """Find the section ID and all descendant section IDs recursively."""
+        target_ids = {section_id}
+        added = True
+        while added:
+            added = False
+            for sec in catalog.sections:
+                if (sec.parent_id in target_ids or sec.id.startswith(f"{section_id}/")) and sec.id not in target_ids:
+                    target_ids.add(sec.id)
+                    added = True
+        return target_ids
+
     def get_downloaded_audio_choices(self, section_filter: str = "ALL") -> list[tuple[str, str]]:
         """Get list of downloaded reference audios for playback/inspection."""
         catalog = self.ref_repo.load_catalog()
         if not catalog:
-            return [("No hay audios catalogados", "")]
+            return []
+
+        allowed_sections: Optional[set[str]] = None
+        if section_filter and section_filter != "ALL":
+            allowed_sections = self._get_section_and_descendant_ids(section_filter, catalog)
 
         items = []
         for a in catalog.audios:
             if a.status in (AcquisitionStatus.DOWNLOADED, AcquisitionStatus.VALIDATED) and a.local_path:
+                if allowed_sections is not None:
+                    if (
+                        a.section_id not in allowed_sections
+                        and a.section_id != section_filter
+                        and not a.section_id.startswith(f"{section_filter}/")
+                    ):
+                        continue
                 transcript_preview = (a.transcript or "")[:35]
                 label = f"[{a.id}] {a.original_filename} - {transcript_preview}..."
                 items.append((label, a.id))
 
-        if not items:
-            return [("No hay audios descargados en esta sección", "")]
         return items
 
     def get_all_reference_choices(self) -> list[tuple[str, str]]:
@@ -194,7 +215,7 @@ class VoiceLabApp:
         """Get list of generated records for comparison and evaluation."""
         records = self.gen_repo.list_generations()
         if not records:
-            return [("No hay generaciones registradas", "")]
+            return []
         items = []
         for r in records:
             label = f"[{r.generation_id}] {r.profile_name} - {r.text[:30]}... ({r.duration_seconds:.1f}s)"
@@ -353,7 +374,7 @@ class VoiceLabApp:
         temperature: float,
         cfg_weight: float,
         reference_audio_id: Optional[str] = None,
-    ) -> tuple[Optional[str], str, list[tuple[str, str]]]:
+    ) -> tuple[Optional[str], str, Any]:
         """Orchestrate speech generation from the interactive laboratory."""
         try:
             ref_path = None
@@ -378,8 +399,16 @@ class VoiceLabApp:
             )
 
             status_icon = "✅" if rec.status == "SUCCESS" else "❌"
+            is_sim = "simulat" in rec.generator_device.lower() or "simula" in rec.model_name.lower()
+            banner = ""
+            if is_sim:
+                banner = (
+                    "> [!WARNING]\n"
+                    "> **MODO SIMULACIÓN ACÚSTICA (Fallback Local)**: No se ha detectado un motor neuronal de voz "
+                    "(Chatterbox / PyTorch no instalados). Se generó una onda senoidal acústica modulada a ~220 Hz como prueba técnica de tubería.\n\n"
+                )
             summary_md = f"""
-### {status_icon} Síntesis Completada: `{rec.generation_id}`
+{banner}### {status_icon} Síntesis Completada: `{rec.generation_id}`
 
 - **Perfil**: **{rec.profile_name}** (`{rec.profile_id}`)
 - **Texto**: *\"{rec.text}\"*
@@ -393,10 +422,10 @@ class VoiceLabApp:
 - **Ruta**: `{rec.audio_path}`
 """
             new_gen_choices = self.get_generation_choices()
-            return rec.audio_path, summary_md, new_gen_choices
+            return rec.audio_path, summary_md, gr.Dropdown(choices=new_gen_choices, value=rec.generation_id)
         except Exception as exc:
             logger.error(f"Generation error: {exc}")
-            return None, f"❌ **Error en la síntesis**: {exc}", self.get_generation_choices()
+            return None, f"❌ **Error en la síntesis**: {exc}", gr.Dropdown(choices=self.get_generation_choices())
 
     # -------------------------------------------------------------------------
     # Tab 4: Evaluación Asistida
@@ -717,10 +746,32 @@ class VoiceLabApp:
 
                     def update_ref_choices(sec: str):
                         new_choices = self.get_downloaded_audio_choices(sec)
-                        val = new_choices[0][1] if new_choices else None
-                        return gr.Dropdown(choices=new_choices, value=val)
+                        if new_choices:
+                            val = new_choices[0][1]
+                            audio_path, md = self.inspect_selected_reference(val)
+                            return gr.Dropdown(choices=new_choices, value=val), audio_path, md
+                        else:
+                            sec_label = sec if sec != "ALL" else "Todas las secciones"
+                            empty_md = (
+                                f"### ⚠️ No hay audios descargados en esta sección (`{sec_label}`)\n\n"
+                                "Actualmente no existen archivos `.wav` descargados localmente para esta sección del doblaje.\n\n"
+                                "👉 **Cómo obtenerlos:**\n"
+                                "1. Vaya a la pestaña **1. Fuente y Adquisición**.\n"
+                                f"2. Seleccione esta sección (`{sec_label}`) en la configuración de descarga.\n"
+                                "3. Ajuste el límite deseado y presione **⬇️ Iniciar Adquisición Controlada**."
+                            )
+                            return gr.Dropdown(choices=[], value=None), None, empty_md
 
-                    ref_filter_sec.change(fn=update_ref_choices, inputs=[ref_filter_sec], outputs=[ref_audio_dropdown])
+                    ref_filter_sec.change(
+                        fn=update_ref_choices,
+                        inputs=[ref_filter_sec],
+                        outputs=[ref_audio_dropdown, ref_audio_player, ref_info_md],
+                    )
+                    ref_audio_dropdown.input(
+                        fn=self.inspect_selected_reference,
+                        inputs=[ref_audio_dropdown],
+                        outputs=[ref_audio_player, ref_info_md],
+                    )
                     btn_load_ref.click(
                         fn=self.inspect_selected_reference,
                         inputs=[ref_audio_dropdown],

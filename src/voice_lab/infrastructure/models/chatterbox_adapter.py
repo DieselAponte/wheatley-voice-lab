@@ -21,13 +21,19 @@ class ChatterboxAdapter(SpeechGenerator):
         device: Optional[str] = None,
         model_name: str = "ResembleAI/Chatterbox-Multilingual-es-es",
         sample_rate: int = 24000,
+        simulate: bool = False,
     ):
         self.requested_device = device
-        self.model_name = model_name
+        self.simulate = simulate
+        self._is_chatterbox_available = self._check_chatterbox_available() and not simulate
+        self.device = self._resolve_device(device) if self._is_chatterbox_available else "cpu (simulated fallback)"
+        self.model_name = (
+            model_name
+            if self._is_chatterbox_available
+            else "Simulador Acústico (Fallback Sine Wave - Chatterbox no instalado)"
+        )
         self.sample_rate = sample_rate
-        self.device = self._resolve_device(device)
         self._model: Any = None
-        self._is_chatterbox_available = self._check_chatterbox_available()
 
     def _check_chatterbox_available(self) -> bool:
         """Check if torch and chatterbox are installed in the active environment."""
@@ -72,12 +78,16 @@ class ChatterboxAdapter(SpeechGenerator):
             return
 
         try:
+            import torch
             from chatterbox.mtl_tts import ChatterboxMultilingualTTS
-            logger.info(f"Loading Chatterbox model ({self.model_name}) on device={self.device}...")
-            self._model = ChatterboxMultilingualTTS.from_pretrained(device=self.device)
+            dev_str = "cpu" if (self.device == "cpu" or not torch.cuda.is_available()) else "cuda"
+            logger.info(f"Loading Chatterbox model ({self.model_name}) on device={dev_str}...")
+            self._model = ChatterboxMultilingualTTS.from_pretrained(device=dev_str)
+            self.model_name = "ResembleAI/Chatterbox-Multilingual-es-es"
             logger.info("Chatterbox model loaded successfully.")
         except Exception as e:
             logger.error(f"Failed to load Chatterbox model: {e}")
+            self._model = None
             raise RuntimeError(f"Chatterbox initialization error: {e}") from e
 
     def generate(
@@ -98,6 +108,10 @@ class ChatterboxAdapter(SpeechGenerator):
         speed = float(profile_params.get("speed", 1.0))
         exaggeration = float(profile_params.get("exaggeration", 0.5))
         cfg_weight = float(profile_params.get("cfg_weight", 0.5))
+        temperature = float(profile_params.get("temperature", 0.7))
+
+        if self._is_chatterbox_available and self._model is None:
+            self.load_model()
 
         if self._is_chatterbox_available and self._model is not None:
             # Real model execution
@@ -109,9 +123,11 @@ class ChatterboxAdapter(SpeechGenerator):
                     audio_prompt_path=ref_path_str,
                     exaggeration=exaggeration,
                     cfg_weight=cfg_weight,
+                    temperature=temperature,
                 )
                 import torchaudio as ta
-                ta.save(str(out_path), wav, self.sample_rate)
+                sr = getattr(self._model, "sr", self.sample_rate)
+                ta.save(str(out_path), wav, sr)
                 logger.info(f"Generated Chatterbox audio saved to {out_path}")
                 return out_path
             except Exception as e:

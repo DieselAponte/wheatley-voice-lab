@@ -10,3 +10,5 @@ gradio
 python-dotenv
 google-genai
 tenacity
+chatterbox-tts
+setuptools<70

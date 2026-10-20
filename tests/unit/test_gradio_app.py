@@ -4,6 +4,8 @@ from pathlib import Path
 
 import gradio as gr
 
+from src.voice_lab.application.generation_service import GenerationService
+from src.voice_lab.infrastructure.models.chatterbox_adapter import ChatterboxAdapter
 from src.voice_lab.infrastructure.persistence.json_generation_repository import (
     JsonGenerationRepository,
 )
@@ -77,9 +79,16 @@ def test_tab2_reference_inspection(sample_catalog_path: Path, tmp_path: Path, sa
     audio.local_path = str(sample_wav_path)
     ref_repo.update_audio(audio)
 
-    choices = app.get_downloaded_audio_choices("ALL")
-    assert len(choices) >= 1
-    assert choices[0][1] == "audio_01"
+    choices_all = app.get_downloaded_audio_choices("ALL")
+    assert len(choices_all) >= 1
+    assert choices_all[0][1] == "audio_01"
+
+    choices_match = app.get_downloaded_audio_choices("capitulo-1")
+    assert len(choices_match) >= 1
+    assert choices_match[0][1] == "audio_01"
+
+    choices_empty = app.get_downloaded_audio_choices("capitulo-2")
+    assert len(choices_empty) == 0
 
     path, md = app.inspect_selected_reference("audio_01")
     assert path == str(sample_wav_path)
@@ -92,7 +101,11 @@ def test_tab3_synthesis_and_profiles(sample_catalog_path: Path, tmp_path: Path):
     """Test speech generation tab methods."""
     ref_repo = JsonReferenceRepository(catalog_path=sample_catalog_path)
     gen_repo = JsonGenerationRepository(generated_dir=tmp_path / "gen")
-    app = VoiceLabApp(ref_repo=ref_repo, gen_repo=gen_repo)
+    gen_svc = GenerationService(
+        generator=ChatterboxAdapter(simulate=True),
+        repository=gen_repo,
+    )
+    app = VoiceLabApp(ref_repo=ref_repo, gen_repo=gen_repo, generation_service=gen_svc)
 
     # Profile selection
     desc, spd, exag, temp, cfg, phrases = app.on_profile_selected("Entusiasmado")
@@ -113,7 +126,7 @@ def test_tab3_synthesis_and_profiles(sample_catalog_path: Path, tmp_path: Path):
     assert audio_path is not None
     assert Path(audio_path).exists()
     assert "Síntesis Completada" in summary_md
-    assert len(choices) >= 1
+    assert len(choices.choices) >= 1
 
 
 def test_tab4_evaluation_privacy_shield(sample_catalog_path: Path, tmp_path: Path, sample_wav_path: Path):

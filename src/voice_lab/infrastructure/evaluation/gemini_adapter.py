@@ -48,7 +48,7 @@ Analiza este audio y devuelve un JSON estricto con las siguientes propiedades:
         api_key: Optional[str] = None,
         model_name: Optional[str] = None,
     ):
-        self.api_key = api_key or settings.gemini_api_key
+        self.api_key = api_key if api_key is not None else settings.gemini_api_key
         self.model_name = model_name or settings.gemini_model
         if not self.api_key:
             logger.warning("GeminiAudioEvaluator initialized without GEMINI_API_KEY. Calls will fail unless simulated.")

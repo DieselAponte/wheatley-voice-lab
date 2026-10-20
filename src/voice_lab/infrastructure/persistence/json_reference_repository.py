@@ -21,6 +21,7 @@ class JsonReferenceRepository(ReferenceRepository):
     def __init__(self, catalog_path: Path = Path("data/metadata/discovery_catalog.json")):
         self.catalog_path = catalog_path
         self._cached_catalog: Optional[DiscoveryCatalog] = None
+        self._last_mtime: float = 0.0
 
     def save_catalog(self, catalog: DiscoveryCatalog) -> None:
         """Persist catalog safely to JSON."""
@@ -30,24 +31,30 @@ class JsonReferenceRepository(ReferenceRepository):
             json.dump(catalog.model_dump(), f, indent=2, ensure_ascii=False)
         temp_path.replace(self.catalog_path)
         self._cached_catalog = catalog
+        try:
+            self._last_mtime = self.catalog_path.stat().st_mtime
+        except Exception:
+            self._last_mtime = 0.0
         logger.info(f"Saved catalog with {len(catalog.audios)} audios to {self.catalog_path}")
 
     def load_catalog(self) -> Optional[DiscoveryCatalog]:
-        """Load catalog from disk if it exists."""
-        if self._cached_catalog is not None:
-            return self._cached_catalog
-
+        """Load catalog from disk if it exists, refreshing automatically if modified."""
         if not self.catalog_path.exists():
             return None
 
         try:
+            mtime = self.catalog_path.stat().st_mtime
+            if self._cached_catalog is not None and mtime <= self._last_mtime:
+                return self._cached_catalog
+
             with open(self.catalog_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             self._cached_catalog = DiscoveryCatalog.model_validate(data)
+            self._last_mtime = mtime
             return self._cached_catalog
         except Exception as e:
             logger.error(f"Error loading catalog from {self.catalog_path}: {e}")
-            return None
+            return self._cached_catalog
 
     def get_audio_by_id(self, audio_id: str) -> Optional[ReferenceAudio]:
         """Find an audio entry by its stable ID."""
