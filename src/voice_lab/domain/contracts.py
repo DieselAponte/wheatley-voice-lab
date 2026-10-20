@@ -7,6 +7,7 @@ from src.voice_lab.domain.models import (
     ReferenceAudio,
     ReferenceSection,
 )
+from src.voice_lab.domain.evaluation_models import AudioEvaluation
 
 
 @runtime_checkable
@@ -57,4 +58,20 @@ class AudioStorage(Protocol):
 
     def exists(self, path: Path) -> bool:
         """Check if an audio file exists locally."""
+        ...
+
+
+@runtime_checkable
+class AudioEvaluator(Protocol):
+    """Protocol for evaluating audio expressiveness, transcription, and prosody."""
+
+    def evaluate(
+        self,
+        audio_path: Path,
+        audio_id: str,
+        audio_sha256: str,
+        is_reference: bool = False,
+        expected_transcript: Optional[str] = None,
+    ) -> "AudioEvaluation":
+        """Evaluate an audio file and return a structured perception report."""
         ...

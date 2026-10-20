@@ -155,7 +155,7 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 | **0** | **Auditoría del repositorio y planificación** | **COMPLETADA** | Auditoría técnica de hardware/software, diagnóstico de dependencias, matriz de requisitos, creación de `.env.example` y `README.md` evolutivo. |
 | **1** | **Modelado del dominio y adquisición de estructura** | **COMPLETADA** | Modelos Pydantic v2, contratos de repositorio, cliente HTTP resiliente con tenacity, parser BeautifulSoup4 de ToC y audios, tests offline y CLI inspect. |
 | **2** | **Descarga controlada y organización jerárquica** | **COMPLETADA** | Downloader resiliente con rate-limit, SHA-256, jerarquía de directorios por capítulo, modo dry-run y persistencia JSON. |
-| **3** | Validación, inspección técnica y catálogo | *Pendiente* | Analizador acústico con SoundFile/Librosa, clasificación de estados de integridad, derivados y estadísticas de cobertura. |
+| **3** | **Validación, inspección técnica y catálogo** | **COMPLETADA** | Analizador acústico determinista (SoundFile/Librosa), estados de integridad, derivados inmutables y estadísticas por sección. |
 | **4** | Evaluación expresiva con Gemini API | *Pendiente* | Contrato `AudioEvaluator`, adaptador para `google-genai`, control de consentimiento para envío de referencias, caché y pruebas con mocks. |
 | **5** | Integración de Chatterbox y perfiles expresivos | *Pendiente* | Diagnóstico de API de Chatterbox, gestión de recursos GPU/CPU (GTX 1650), definición de perfiles JSON y generación base. |
 | **6** | Servicio de generación, persistencia y comparación | *Pendiente* | Orquestación de casos de uso, persistencia de metadatos de generación, historial reproducible y exportación selectiva. |
@@ -173,7 +173,7 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 - [x] **Pruebas unitarias de adquisición**: Pruebas offline mediante fixtures HTML locales con 100% de éxito.
 - [x] **Descargador resiliente con rate-limiting**: Gestión de reintentos, validación de contenido, modo dry-run y cálculo SHA-256.
 - [x] **Organización jerárquica de ficheros**: Estructura de carpetas en disco reflejando los capítulos sanitizados para Windows.
-- [ ] **Analizador acústico determinista**: Extracción de duración, frecuencia, canales, RMS, silencios y clipping.
+- [x] **Analizador acústico determinista**: Extracción de duración, frecuencia, canales, RMS, silencios, clipping y gestión de derivados.
 - [ ] **Adaptador de evaluación Gemini**: Integración con el SDK `google-genai` con esquemas estructurados de prosodia y transcripción.
 - [ ] **Control de privacidad de referencias**: Mecanismo de bloqueo por defecto antes de transmitir audios protegidos a la API externa.
 - [ ] **Adaptador de síntesis Chatterbox**: Envoltorio sobre Chatterbox Multilingual (es-ES) con soporte para aceleración o CPU fallback.
@@ -284,11 +284,21 @@ git status
   - Pruebas unitarias con `httpx.MockTransport` en `tests/unit/test_acquisition.py` (11 pruebas pasando).
   - Descarga real verificada de audios de muestra en `data/references/`.
 
+### Fase 3: Validación, Inspección Técnica y Preparación del Catálogo de Audio
+- **Estado**: COMPLETADA.
+- **Acciones realizadas**:
+  - Analizador acústico `AudioInspector` con SoundFile y NumPy/Librosa (duración, sample rate, canales, RMS, pico dBFS, clipping, silencios).
+  - Generador de derivados `AudioProcessor` (resampling SOXR a 24 kHz mono) preservando la inmutabilidad de originales.
+  - Servicio `CatalogService` con validación y compilación de estadísticas por sección.
+  - Suite de pruebas unitarias en `tests/unit/test_audio_validation.py` (17 pruebas totales pasando).
+  - Inspección técnica real ejecutada sobre las referencias descargadas (100% validadas, 7.29s totales).
+
 ---
 
 ## 12. Retroalimentación Técnica para la Siguiente Iteración
 
-Para la **Fase 3 (Validación, inspección técnica y preparación del catálogo de audio)**:
-- **Diagnóstico acústico rápido**: El análisis con `soundfile` es ligero y muy rápido para verificar integridad (duración, samplerate, canales, RMS, pico dBFS, silencios y clipping).
-- **Tratamiento de formatos**: Los archivos son WAV mono 44.1 kHz. En caso de requerir derivados (ej. remuestreo a 24 kHz mono para Chatterbox), se guardarán en subcarpetas derivadas sin sobrescribir nunca los originales.
-- **Resumen estadístico**: La aplicación debe exponer métricas claras (total descubiertos, descargados, válidos con advertencias, no válidos).
+Para la **Fase 4 (Evaluación expresiva mediante la API de Gemini)**:
+- **SDK oficial `google-genai`**: Utilizar `from google import genai; client = genai.Client()`.
+- **Privacidad y Opt-In**: Mantener por defecto `allow_reference_external_eval = False` para proteger audios de Valve contra transmisión desatendida.
+- **Caché determinista**: Indexar evaluaciones por hash SHA-256 del audio + identificador del modelo + versión del prompt del evaluador.
+- **Pruebas con Mock**: Proveer `MockAudioEvaluator` para que la suite de pruebas unitarias corra sin necesidad de API key ni saldo.
