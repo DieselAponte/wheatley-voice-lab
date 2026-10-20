@@ -154,7 +154,7 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 | :---: | :--- | :---: | :--- |
 | **0** | **Auditoría del repositorio y planificación** | **COMPLETADA** | Auditoría técnica de hardware/software, diagnóstico de dependencias, matriz de requisitos, creación de `.env.example` y `README.md` evolutivo. |
 | **1** | **Modelado del dominio y adquisición de estructura** | **COMPLETADA** | Modelos Pydantic v2, contratos de repositorio, cliente HTTP resiliente con tenacity, parser BeautifulSoup4 de ToC y audios, tests offline y CLI inspect. |
-| **2** | Descarga controlada y organización jerárquica | *Pendiente* | Downloader resiliente con rate-limit, SHA-256, jerarquía de directorios por capítulo, modo dry-run y persistencia JSON. |
+| **2** | **Descarga controlada y organización jerárquica** | **COMPLETADA** | Downloader resiliente con rate-limit, SHA-256, jerarquía de directorios por capítulo, modo dry-run y persistencia JSON. |
 | **3** | Validación, inspección técnica y catálogo | *Pendiente* | Analizador acústico con SoundFile/Librosa, clasificación de estados de integridad, derivados y estadísticas de cobertura. |
 | **4** | Evaluación expresiva con Gemini API | *Pendiente* | Contrato `AudioEvaluator`, adaptador para `google-genai`, control de consentimiento para envío de referencias, caché y pruebas con mocks. |
 | **5** | Integración de Chatterbox y perfiles expresivos | *Pendiente* | Diagnóstico de API de Chatterbox, gestión de recursos GPU/CPU (GTX 1650), definición de perfiles JSON y generación base. |
@@ -171,9 +171,8 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 - [x] **Modelos de dominio tipados**: Entidades `ReferenceSection`, `ReferenceAudio`, `AssetProvenance`, `SourcePage`, `DiscoveryCatalog` en Pydantic v2.
 - [x] **Parser de Portal Wiki**: Extracción de ToC, jerarquía de 92 capítulos/subsecciones y 823 URLs de audio asociadas.
 - [x] **Pruebas unitarias de adquisición**: Pruebas offline mediante fixtures HTML locales con 100% de éxito.
-- [x] **CLI de inspección en solo lectura**: `scripts/inspect_source.py` con modos fixture, live y persistencia JSON.
-- [ ] **Descargador resiliente con rate-limiting**: Gestión de reintentos, validación de contenido y cálculo SHA-256.
-- [ ] **Organización jerárquica de ficheros**: Estructura de carpetas en disco reflejando los capítulos de la wiki.
+- [x] **Descargador resiliente con rate-limiting**: Gestión de reintentos, validación de contenido, modo dry-run y cálculo SHA-256.
+- [x] **Organización jerárquica de ficheros**: Estructura de carpetas en disco reflejando los capítulos sanitizados para Windows.
 - [ ] **Analizador acústico determinista**: Extracción de duración, frecuencia, canales, RMS, silencios y clipping.
 - [ ] **Adaptador de evaluación Gemini**: Integración con el SDK `google-genai` con esquemas estructurados de prosodia y transcripción.
 - [ ] **Control de privacidad de referencias**: Mecanismo de bloqueo por defecto antes de transmitir audios protegidos a la API externa.
@@ -276,11 +275,20 @@ git status
   - Suite de pruebas unitarias 100% offline con fixtures (`tests/unit/test_parser.py`, `tests/unit/test_models.py`, `tests/unit/test_repository.py`).
   - Herramienta CLI de inspección `scripts/inspect_source.py` con persistencia en `data/metadata/discovery_catalog.json`.
 
+### Fase 2: Descarga Controlada y Organización de los Audios de Referencia
+- **Estado**: COMPLETADA.
+- **Acciones realizadas**:
+  - Implementación de `LocalAudioStorage` con rutas sanitizadas para Windows y cálculo de SHA-256.
+  - Implementación de `AcquisitionService` con idempotencia estricta, descarga atómica mediante `.tmp`, y actualización de metadatos.
+  - Script CLI `scripts/acquire_references.py` con soporte para `--dry-run`, `--section`, `--audio-id`, `--limit` y `--force`.
+  - Pruebas unitarias con `httpx.MockTransport` en `tests/unit/test_acquisition.py` (11 pruebas pasando).
+  - Descarga real verificada de audios de muestra en `data/references/`.
+
 ---
 
 ## 12. Retroalimentación Técnica para la Siguiente Iteración
 
-Para la **Fase 2 (Descarga controlada y organización de los audios de referencia)**:
-- **Descargas selectivas**: Dado que se descubrieron 823 archivos, la descarga masiva tardaría varios minutos respetando los 1.5s entre peticiones. El servicio debe permitir descargar subconjuntos específicos por sección (ej. solo el Capítulo 1 o una cámara concreta) o modo `--dry-run`.
-- **Integridad SHA-256**: Se debe calcular el hash tras descargar al fichero temporal `.tmp` y validar que el archivo no esté vacío antes de moverlo a su ruta final.
-- **Estructura en disco**: Organizar los ficheros bajo `data/references/<capitulo>/<subseccion>/<filename>.wav` para una fácil navegación humana y del explorador de Gradio.
+Para la **Fase 3 (Validación, inspección técnica y preparación del catálogo de audio)**:
+- **Diagnóstico acústico rápido**: El análisis con `soundfile` es ligero y muy rápido para verificar integridad (duración, samplerate, canales, RMS, pico dBFS, silencios y clipping).
+- **Tratamiento de formatos**: Los archivos son WAV mono 44.1 kHz. En caso de requerir derivados (ej. remuestreo a 24 kHz mono para Chatterbox), se guardarán en subcarpetas derivadas sin sobrescribir nunca los originales.
+- **Resumen estadístico**: La aplicación debe exponer métricas claras (total descubiertos, descargados, válidos con advertencias, no válidos).

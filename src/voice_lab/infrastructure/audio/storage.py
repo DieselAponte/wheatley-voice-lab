@@ -8,6 +8,9 @@ from typing import Optional
 from src.voice_lab.domain.contracts import AudioStorage
 
 
+from src.voice_lab.infrastructure.wiki.parser import sanitize_filename
+
+
 def sanitize_path_segment(segment: str) -> str:
     """Sanitize directory names for Windows and Unix filesystem safety."""
     clean = re.sub(r'[\\/*?:"<>|]', "_", segment)
@@ -27,7 +30,8 @@ class LocalAudioStorage(AudioStorage):
         target_dir = self.reference_base_dir
         for seg in segments:
             target_dir = target_dir / seg
-        return target_dir / filename
+        clean_filename = sanitize_filename(filename)
+        return target_dir / clean_filename
 
     def exists(self, path: Path) -> bool:
         """Check if an audio file exists and is not empty."""

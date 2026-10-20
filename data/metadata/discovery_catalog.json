@@ -848,7 +848,7 @@
       "section_path": "Capítulo 1: Despertares > Introducción > Antes de abrir la puerta",
       "order_in_section": 0,
       "expected_format": "wav",
-      "status": "DISCOVERED",
+      "status": "DOWNLOADED",
       "provenance": {
         "source_page_url": "https://theportalwiki.com/wiki/Wheatley_voice_lines/es",
         "file_page_url": "https://theportalwiki.com/wiki/File:Wheatley_openinghello01_es.wav",
@@ -857,13 +857,13 @@
         "verification_status": "VERIFIED_VALVE_PROPRIETARY",
         "notes": "Non-commercial experimental research and speech synthesis evaluation."
       },
-      "local_path": null,
-      "file_size_bytes": null,
-      "checksum_sha256": null,
+      "local_path": "data\\references\\capitulo-1-despertares\\introduccion\\antes-de-abrir-la-puerta\\Wheatley_openinghello01_es.wav",
+      "file_size_bytes": 163664,
+      "checksum_sha256": "891dc4ee5f39a41e007080514431ed112013e82dace47215dad4e153f59e5413",
       "duration_seconds": null,
       "sample_rate_hz": null,
       "channels": null,
-      "acquired_at": null,
+      "acquired_at": "2026-10-20T16:50:15.954148+00:00",
       "error_message": null
     },
     {
@@ -876,7 +876,7 @@
       "section_path": "Capítulo 1: Despertares > Introducción > Antes de abrir la puerta",
       "order_in_section": 1,
       "expected_format": "wav",
-      "status": "DISCOVERED",
+      "status": "DOWNLOADED",
       "provenance": {
         "source_page_url": "https://theportalwiki.com/wiki/Wheatley_voice_lines/es",
         "file_page_url": "https://theportalwiki.com/wiki/File:Wheatley_openinghello12_es.wav",
@@ -885,13 +885,13 @@
         "verification_status": "VERIFIED_VALVE_PROPRIETARY",
         "notes": "Non-commercial experimental research and speech synthesis evaluation."
       },
-      "local_path": null,
-      "file_size_bytes": null,
-      "checksum_sha256": null,
+      "local_path": "data\\references\\capitulo-1-despertares\\introduccion\\antes-de-abrir-la-puerta\\Wheatley_openinghello12_es.wav",
+      "file_size_bytes": 69200,
+      "checksum_sha256": "52c0f586d8211d3dbf313e080d10804c397438913ec7bcd0ec7bb75262222a25",
       "duration_seconds": null,
       "sample_rate_hz": null,
       "channels": null,
-      "acquired_at": null,
+      "acquired_at": "2026-10-20T16:50:17.167358+00:00",
       "error_message": null
     },
     {
@@ -904,7 +904,7 @@
       "section_path": "Capítulo 1: Despertares > Introducción > Antes de abrir la puerta",
       "order_in_section": 2,
       "expected_format": "wav",
-      "status": "DISCOVERED",
+      "status": "DOWNLOADED",
       "provenance": {
         "source_page_url": "https://theportalwiki.com/wiki/Wheatley_voice_lines/es",
         "file_page_url": "https://theportalwiki.com/wiki/File:Wheatley_openinghello13_es.wav",
@@ -913,13 +913,13 @@
         "verification_status": "VERIFIED_VALVE_PROPRIETARY",
         "notes": "Non-commercial experimental research and speech synthesis evaluation."
       },
-      "local_path": null,
-      "file_size_bytes": null,
-      "checksum_sha256": null,
+      "local_path": "data\\references\\capitulo-1-despertares\\introduccion\\antes-de-abrir-la-puerta\\Wheatley_openinghello13_es.wav",
+      "file_size_bytes": 281168,
+      "checksum_sha256": "e8f2e5ee85021f4e27dd9fc82df6fd7e42874d3e4ab9fe6ec62c0fa5c3086e88",
       "duration_seconds": null,
       "sample_rate_hz": null,
       "channels": null,
-      "acquired_at": null,
+      "acquired_at": "2026-10-20T16:50:34.753284+00:00",
       "error_message": null
     },
     {
@@ -932,7 +932,7 @@
       "section_path": "Capítulo 1: Despertares > Introducción > Antes de abrir la puerta",
       "order_in_section": 3,
       "expected_format": "wav",
-      "status": "DISCOVERED",
+      "status": "DOWNLOADED",
       "provenance": {
         "source_page_url": "https://theportalwiki.com/wiki/Wheatley_voice_lines/es",
         "file_page_url": "https://theportalwiki.com/wiki/File:Wheatley_openinghello15_es.wav",
@@ -941,13 +941,13 @@
         "verification_status": "VERIFIED_VALVE_PROPRIETARY",
         "notes": "Non-commercial experimental research and speech synthesis evaluation."
       },
-      "local_path": null,
-      "file_size_bytes": null,
-      "checksum_sha256": null,
+      "local_path": "data\\references\\capitulo-1-despertares\\introduccion\\antes-de-abrir-la-puerta\\Wheatley_openinghello15_es.wav",
+      "file_size_bytes": 129104,
+      "checksum_sha256": "12c45d391de9a3133c7f4b0edee58aa0ab922908d585979af7a3eefa57ee7f24",
       "duration_seconds": null,
       "sample_rate_hz": null,
       "channels": null,
-      "acquired_at": null,
+      "acquired_at": "2026-10-20T16:50:35.146775+00:00",
       "error_message": null
     },
     {
