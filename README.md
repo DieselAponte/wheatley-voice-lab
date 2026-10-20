@@ -310,11 +310,27 @@ git status
   - Documentación de especificación completa de comandos CLI de entrenamiento, dataset format y LoRA fine-tuning en `docs/phase-5.md` sin ejecución pesada desatendida.
   - Suite de pruebas unitarias en `tests/unit/test_speech_generation.py` (25 pruebas totales pasando).
 
+### Fase 6: Servicio de Generación, Persistencia y Comparación
+- **Estado**: COMPLETADA.
+- **Acciones realizadas**:
+  - Modelos de dominio `GenerationRecord` y `GenerationComparison` en `src/voice_lab/domain/generation_models.py`.
+  - Repositorio de persistencia atómica en disco `JsonGenerationRepository` en `src/voice_lab/infrastructure/persistence/json_generation_repository.py`.
+  - Servicios de aplicación `GenerationService` y `ComparisonService` en `src/voice_lab/application/`.
+  - Exportador de paquetes de auditoría (`manifest.json`, WAVs y evaluaciones).
+  - Herramienta CLI de generación y comparación por lotes `scripts/generate_batch.py`.
+  - Suite de pruebas ampliada a 29 pruebas unitarias pasando (`tests/unit/test_generation_service.py`).
+  - Documentación detallada en `docs/phase-6.md`.
+
 ---
 
 ## 12. Retroalimentación Técnica para la Siguiente Iteración
 
-Para la **Fase 6 (Servicio de generación, persistencia y comparación de resultados)**:
-- **Orquestación de inferencia**: El servicio `GenerationService` debe coordinar la validación del texto (mínimo 2 caracteres, sanitizado), resolución del perfil, parámetros personalizados y guardado de metadatos completos (`GenerationRecord`).
-- **Historial e Inmutabilidad**: Cada audio generado debe nombrarse con un ID determinista o UUID (`data/generated/gen_<id>.wav`) y su metadato JSON en `data/generated/gen_<id>.json`.
-- **Comparador**: Exponer funciones para contrastar dos o más generaciones de la misma frase, comparando duración, parámetros utilizados y evaluaciones asociadas.
+Para la **Fase 7 (Interfaz Interactiva con Gradio)**:
+- **Estructura en 5 Pestañas**:
+  1. *Fuente y Adquisición*: Inspección de la wiki, selector de capítulos, descarga controlada y visualización de progreso.
+  2. *Catálogo de Referencias*: Navegación jerárquica de audios descargados, reproductor HTML5 y métricas técnicas acústicas (RMS, clipping, sample rate).
+  3. *Laboratorio de Generación*: Entrada de texto, selector de perfiles con sliders para hiperparámetros (`speed`, `exaggeration`, `temperature`, `cfg_weight`), audio prompt opcional y botón de síntesis con feedback.
+  4. *Evaluación Asistida*: Selector de audios para evaluación, interruptor explícito de consentimiento (Privacy Shield) para audios de referencia, y reporte visual de observaciones de IA (emoción percibida, prosodia, naturalidad).
+  5. *Historial y Comparación*: Tabla interactiva de generaciones, reproductor lado a lado y exportación de paquetes de auditoría.
+- **Desacoplamiento Estricto**: Los componentes de Gradio no deben contener lógica de negocio, cálculos de audio ni llamadas HTTP directas; deben delegar 100% en los servicios de la capa de aplicación.
+
