@@ -1,0 +1,12 @@
+httpx
+beautifulsoup4
+pydantic
+pydantic-settings
+soundfile
+librosa
+numpy
+scipy
+gradio
+python-dotenv
+google-genai
+tenacity
