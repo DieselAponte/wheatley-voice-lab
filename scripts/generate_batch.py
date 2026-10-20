@@ -12,7 +12,9 @@ from src.voice_lab.application.generation_service import GenerationService
 from src.voice_lab.domain.profiles import ProfileManager
 from src.voice_lab.infrastructure.config.settings import settings
 from src.voice_lab.infrastructure.models.chatterbox_adapter import ChatterboxAdapter
-from src.voice_lab.infrastructure.persistence.json_generation_repository import JsonGenerationRepository
+from src.voice_lab.infrastructure.persistence.json_generation_repository import (
+    JsonGenerationRepository,
+)
 
 
 def main() -> None:

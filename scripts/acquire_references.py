@@ -9,7 +9,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.voice_lab.application.acquisition_service import AcquisitionService
 from src.voice_lab.infrastructure.config.settings import settings
-from src.voice_lab.infrastructure.persistence.json_reference_repository import JsonReferenceRepository
+from src.voice_lab.infrastructure.persistence.json_reference_repository import (
+    JsonReferenceRepository,
+)
 
 
 def main() -> None:

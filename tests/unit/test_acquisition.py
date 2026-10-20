@@ -1,7 +1,9 @@
 """Unit tests for the AcquisitionService and LocalAudioStorage."""
 
-import httpx
 from pathlib import Path
+
+import httpx
+
 from src.voice_lab.application.acquisition_service import AcquisitionService
 from src.voice_lab.domain.models import (
     AcquisitionStatus,
@@ -12,7 +14,9 @@ from src.voice_lab.domain.models import (
     SourcePage,
 )
 from src.voice_lab.infrastructure.audio.storage import LocalAudioStorage
-from src.voice_lab.infrastructure.persistence.json_reference_repository import JsonReferenceRepository
+from src.voice_lab.infrastructure.persistence.json_reference_repository import (
+    JsonReferenceRepository,
+)
 from src.voice_lab.infrastructure.wiki.http_client import WikiHttpClient
 
 

@@ -1,7 +1,8 @@
 """Unit tests for the Portal Wiki parser."""
 
 from pathlib import Path
-from src.voice_lab.infrastructure.wiki.parser import WikiParser, slugify, sanitize_filename
+
+from src.voice_lab.infrastructure.wiki.parser import WikiParser, sanitize_filename, slugify
 
 
 def test_slugify():

@@ -70,3 +70,7 @@ class JsonGenerationRepository(GenerationRepository):
         if evaluation_id not in record.evaluation_ids:
             record.evaluation_ids.append(evaluation_id)
             self.save_generation(record)
+
+    # Alias for API flexibility
+    attach_evaluation = link_evaluation
+

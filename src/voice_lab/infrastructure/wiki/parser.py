@@ -3,8 +3,9 @@
 import re
 import unicodedata
 from datetime import datetime, timezone
-from typing import Optional, Any
-from urllib.parse import urljoin, unquote
+from typing import Any, Optional
+from urllib.parse import unquote, urljoin
+
 from bs4 import BeautifulSoup, Tag
 
 from src.voice_lab.domain.models import (
@@ -85,7 +86,7 @@ class WikiParser:
                 if not a_tag:
                     continue
 
-                href = a_tag["href"]
+                href = str(a_tag["href"])
                 anchor = href.lstrip("#")
                 toctext_span = a_tag.find("span", class_="toctext")
                 title = toctext_span.get_text(strip=True) if toctext_span else a_tag.get_text(strip=True)
@@ -153,7 +154,7 @@ class WikiParser:
             if el.name in ["h2", "h3", "h4", "h5"]:
                 # Check for heading anchor or text matching known sections
                 span_anchor = el.find("span", id=True)
-                anchor_id = span_anchor["id"] if span_anchor else el.get("id", "")
+                anchor_id = str(span_anchor["id"]) if span_anchor else str(el.get("id", ""))
                 heading_text = el.get_text(strip=True)
 
                 candidate = (
@@ -171,7 +172,7 @@ class WikiParser:
                     links = li.find_all("a", href=True)
                     audio_links = [
                         a for a in links
-                        if any(a["href"].lower().endswith(ext) for ext in self.AUDIO_EXTENSIONS)
+                        if any(str(a["href"]).lower().endswith(ext) for ext in self.AUDIO_EXTENSIONS)
                         or ("class" in a.attrs and "internal" in a["class"])
                     ]
 
@@ -188,7 +189,7 @@ class WikiParser:
                         continue
 
                     for a in audio_links:
-                        href = a["href"]
+                        href = str(a["href"])
                         # Resolve full URL
                         direct_url = href
                         if direct_url.startswith("//"):
@@ -208,7 +209,7 @@ class WikiParser:
                         # Extract transcript from link text or title attribute
                         transcript = a.get_text(strip=True)
                         if not transcript:
-                            transcript = a.get("title", "")
+                            transcript = str(a.get("title", ""))
                         # Clean quotes around dialogue
                         transcript = transcript.strip('"\u201c\u201d\u00ab\u00bb')
 

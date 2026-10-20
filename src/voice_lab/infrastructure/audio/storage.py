@@ -3,11 +3,8 @@
 import hashlib
 import re
 from pathlib import Path
-from typing import Optional
 
 from src.voice_lab.domain.contracts import AudioStorage
-
-
 from src.voice_lab.infrastructure.wiki.parser import sanitize_filename
 
 

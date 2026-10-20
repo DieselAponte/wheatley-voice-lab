@@ -1,8 +1,9 @@
 """Unit tests for expressive emotion profiles and Chatterbox speech adapter."""
 
+from pathlib import Path
+
 import pytest
 import soundfile as sf
-from pathlib import Path
 
 from src.voice_lab.domain.profiles import EmotionProfile, ProfileManager
 from src.voice_lab.infrastructure.models.chatterbox_adapter import ChatterboxAdapter

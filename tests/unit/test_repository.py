@@ -8,7 +8,9 @@ from src.voice_lab.domain.models import (
     ReferenceSection,
     SourcePage,
 )
-from src.voice_lab.infrastructure.persistence.json_reference_repository import JsonReferenceRepository
+from src.voice_lab.infrastructure.persistence.json_reference_repository import (
+    JsonReferenceRepository,
+)
 
 
 def test_repository_save_and_load(tmp_path):

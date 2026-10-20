@@ -2,8 +2,9 @@
 
 import json
 from pathlib import Path
-from typing import Any, Optional
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProfileParameter(BaseModel):

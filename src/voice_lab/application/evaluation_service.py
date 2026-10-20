@@ -43,7 +43,8 @@ class EvaluationService:
             return {}
         try:
             with open(self._index_file, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                return {str(k): str(v) for k, v in data.items()} if isinstance(data, dict) else {}
         except Exception as e:
             logger.warning(f"Could not load evaluation index: {e}")
             return {}

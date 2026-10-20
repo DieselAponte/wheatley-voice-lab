@@ -4,7 +4,6 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import Optional
 
 from src.voice_lab.domain.contracts import GenerationRepository
 from src.voice_lab.domain.generation_models import GenerationComparison, GenerationRecord
@@ -79,11 +78,17 @@ class ComparisonService:
             exported_records.append(record_dict)
 
         manifest_path = dest / "export_manifest.json"
+        manifest_data = {
+            "total_items": len(exported_records),
+            "exported_items": exported_records,
+        }
         with open(manifest_path, "w", encoding="utf-8") as f:
-            json.dump({
-                "total_items": len(exported_records),
-                "exported_items": exported_records,
-            }, f, indent=2, ensure_ascii=False)
+            json.dump(manifest_data, f, indent=2, ensure_ascii=False)
+
+        # Write standard manifest.json alias for universal package consumption
+        alias_manifest = dest / "manifest.json"
+        with open(alias_manifest, "w", encoding="utf-8") as f:
+            json.dump(manifest_data, f, indent=2, ensure_ascii=False)
 
         logger.info(f"Exported bundle with {len(exported_records)} items to {dest}")
         return dest

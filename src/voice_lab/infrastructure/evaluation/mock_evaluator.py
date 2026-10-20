@@ -1,7 +1,6 @@
 """Mock audio evaluator for offline testing and deterministic verification."""
 
 import uuid
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 

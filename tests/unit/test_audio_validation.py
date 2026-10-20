@@ -1,12 +1,11 @@
 """Unit tests for acoustic inspection, technical validation, and audio derivatives."""
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 import soundfile as sf
-from pathlib import Path
 
-from src.voice_lab.infrastructure.audio.validation import AudioInspector
-from src.voice_lab.infrastructure.audio.processing import AudioProcessor
 from src.voice_lab.application.catalog_service import CatalogService
 from src.voice_lab.domain.models import (
     AcquisitionStatus,
@@ -16,7 +15,11 @@ from src.voice_lab.domain.models import (
     ReferenceSection,
     SourcePage,
 )
-from src.voice_lab.infrastructure.persistence.json_reference_repository import JsonReferenceRepository
+from src.voice_lab.infrastructure.audio.processing import AudioProcessor
+from src.voice_lab.infrastructure.audio.validation import AudioInspector
+from src.voice_lab.infrastructure.persistence.json_reference_repository import (
+    JsonReferenceRepository,
+)
 
 
 @pytest.fixture

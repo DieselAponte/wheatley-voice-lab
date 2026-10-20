@@ -1,14 +1,15 @@
 """Domain contracts and interfaces (Protocols) for Wheatley Voice Lab."""
 
-from typing import Protocol, runtime_checkable, Optional
 from pathlib import Path
+from typing import Optional, Protocol, runtime_checkable
+
+from src.voice_lab.domain.evaluation_models import AudioEvaluation
+from src.voice_lab.domain.generation_models import GenerationRecord
 from src.voice_lab.domain.models import (
     DiscoveryCatalog,
     ReferenceAudio,
     ReferenceSection,
 )
-from src.voice_lab.domain.evaluation_models import AudioEvaluation
-from src.voice_lab.domain.generation_models import GenerationRecord
 
 
 @runtime_checkable

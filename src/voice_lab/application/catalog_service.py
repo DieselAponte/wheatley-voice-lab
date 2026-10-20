@@ -2,11 +2,11 @@
 
 import logging
 from typing import Any, Optional
-from pathlib import Path
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from src.voice_lab.domain.contracts import ReferenceRepository
-from src.voice_lab.domain.models import AcquisitionStatus, ReferenceAudio, ReferenceSection
+from src.voice_lab.domain.models import AcquisitionStatus, ReferenceAudio
 from src.voice_lab.infrastructure.audio.validation import AudioInspector, AudioTechnicalProfile
 
 logger = logging.getLogger(__name__)

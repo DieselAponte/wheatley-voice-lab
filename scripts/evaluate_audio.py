@@ -15,7 +15,9 @@ from src.voice_lab.infrastructure.audio.storage import LocalAudioStorage
 from src.voice_lab.infrastructure.config.settings import settings
 from src.voice_lab.infrastructure.evaluation.gemini_adapter import GeminiAudioEvaluator
 from src.voice_lab.infrastructure.evaluation.mock_evaluator import MockAudioEvaluator
-from src.voice_lab.infrastructure.persistence.json_reference_repository import JsonReferenceRepository
+from src.voice_lab.infrastructure.persistence.json_reference_repository import (
+    JsonReferenceRepository,
+)
 
 
 def main() -> None:

@@ -158,9 +158,9 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 | **3** | **Validación, inspección técnica y catálogo** | **COMPLETADA** | Analizador acústico determinista (SoundFile/Librosa), estados de integridad, derivados inmutables y estadísticas por sección. |
 | **4** | **Evaluación expresiva con Gemini API** | **COMPLETADA** | Contrato `AudioEvaluator`, adaptador `google-genai`, Privacy Shield para referencias de Valve, caché persistente y mock offline. |
 | **5** | **Integración de Chatterbox y perfiles expresivos** | **COMPLETADA** | Adaptador `ChatterboxAdapter`, 6 perfiles declarativos en JSON, gestión de CPU fallback (GTX 1650 4GB) y comandos de training. |
-| **6** | Servicio de generación, persistencia y comparación | *Pendiente* | Orquestación de casos de uso, persistencia de metadatos de generación, historial reproducible y exportación selectiva. |
-| **7** | Interfaz interactiva con Gradio | *Pendiente* | UI con 5 pestañas conectadas a servicios de aplicación, sin lógica de negocio en la vista y con indicadores claros de estado. |
-| **8** | Integración final, calidad, seguridad y cierre | *Pendiente* | Validación E2E de flujos A, B, C y D, suite completa de pruebas, verificación de seguridad y matriz de aceptación. |
+| **6** | **Servicio de generación, persistencia y comparación** | **COMPLETADA** | `GenerationService`, `ComparisonService`, `JsonGenerationRepository`, exportación de bundles y CLI `generate_batch.py`. |
+| **7** | **Interfaz interactiva con Gradio** | **COMPLETADA** | Dashboard web en 5 pestañas desacopladas (`gradio_app.py`), lanzador `run_app.py` y tema Aperture Science en Gradio 6.30. |
+| **8** | **Integración final, calidad, seguridad y cierre** | **COMPLETADA** | Validación E2E de flujos A, B, C y D, 36 pruebas pytest (84% cov), 0 errores ruff/mypy, auditoría de seguridad y cierre del MVP. |
 
 ---
 
@@ -177,9 +177,10 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 - [x] **Control de privacidad de referencias**: Privacy Shield por defecto que bloquea el envío de audios de Valve a proveedores externos sin consentimiento explícito.
 - [x] **Adaptador de síntesis Chatterbox**: Envoltorio sobre Chatterbox Multilingual (es-ES) con soporte para aceleración o CPU fallback.
 - [x] **Catálogo de perfiles expresivos**: 6 perfiles declarativos en `configs/emotion_profiles.json` con rangos validados.
-- [ ] **Servicio de orquestación de generación**: Generación individual y por lotes con persistencia de parámetros reproducibles.
-- [ ] **Historial y comparador de experimentos**: Comparación lado a lado de frases sintéticas bajo distintos perfiles y parámetros.
-- [ ] **Dashboard interactivo Gradio**: Navegación de catálogo, generación en vivo, evaluación y comparación.
+- [x] **Servicio de orquestación de generación**: Generación individual y por lotes con persistencia de parámetros reproducibles.
+- [x] **Historial y comparador de experimentos**: Comparación lado a lado de frases sintéticas bajo distintos perfiles y parámetros.
+- [x] **Dashboard interactivo Gradio**: Navegación de catálogo, generación en vivo, evaluación asistida, comparador y exportador.
+- [x] **Auditoría de calidad y cierre del MVP**: 36 pruebas automatizadas, 0 errores Ruff/Mypy, 84% de cobertura de código.
 
 ---
 
@@ -188,27 +189,30 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 Los siguientes comandos han sido probados y validados en el entorno activo:
 
 ```powershell
-# 1. Verificación del intérprete Python del entorno virtual
+# 1. Verificación del entorno y dependencias
 .\.venv\Scripts\python.exe --version
 # Salida: Python 3.13.12
 
-# 2. Comprobación de herramientas de calidad
-.\.venv\Scripts\ruff.exe --version
-# Salida: ruff 0.17.1
+# 2. Control de calidad y análisis estático
+.\.venv\Scripts\ruff.exe check .
+# Salida: All checks passed!
 
-.\.venv\Scripts\mypy.exe --version
-# Salida: mypy 2.4.0 (compiled: yes)
+.\.venv\Scripts\mypy.exe --explicit-package-bases src/
+# Salida: Success: no issues found in 25 source files
 
-.\.venv\Scripts\pytest.exe --version
-# Salida: pytest 9.1.1
+# 3. Suite completa de pruebas con cobertura
+.\.venv\Scripts\pytest.exe --cov=src tests/
+# Salida: 36 passed in 13.05s | Cobertura total: 84%
 
-# 3. Comprobación del acelerador de hardware (GPU)
-nvidia-smi
-# Salida: NVIDIA GeForce GTX 1650, Driver 610.88, CUDA 13.3
+# 4. Lanzador de la aplicación web interactiva (Gradio)
+.\.venv\Scripts\python.exe scripts/run_app.py --host 127.0.0.1 --port 7860
+# Dashboard disponible en: http://127.0.0.1:7860
 
-# 4. Estado del repositorio Git
-git status
-# Salida: On branch main
+# 5. Herramientas CLI auxiliares
+.\.venv\Scripts\python.exe scripts/inspect_source.py       # Descubrimiento de la wiki (92 secciones, 823 audios)
+.\.venv\Scripts\python.exe scripts/acquire_references.py --limit 5  # Descarga controlada con SHA-256
+.\.venv\Scripts\python.exe scripts/evaluate_audio.py --audio-id ref_wheatley_01 --mock  # Evaluación
+.\.venv\Scripts\python.exe scripts/generate_batch.py --interactive   # Generación, comparación y exportación
 ```
 
 ---
@@ -321,16 +325,37 @@ git status
   - Suite de pruebas ampliada a 29 pruebas unitarias pasando (`tests/unit/test_generation_service.py`).
   - Documentación detallada en `docs/phase-6.md`.
 
+### Fase 7: Interfaz Interactiva con Gradio
+- **Estado**: COMPLETADA.
+- **Acciones realizadas**:
+  - Implementación completa de la UI web interactiva en `src/voice_lab/presentation/gradio_app.py`.
+  - 5 pestañas funcionales desacopladas: *Fuente y Adquisición*, *Catálogo de Referencias*, *Laboratorio de Generación*, *Evaluación Asistida* e *Historial y Comparación*.
+  - Aperture Science & Portal 2 theme estilizado mediante CSS embebido sin advertencias en Gradio 6.30.
+  - Privacy Shield explícito en la UI con bloqueo preventivo y checkbox opt-in para audios de referencia.
+  - Script lanzador de servidor web configurable `scripts/run_app.py` (`--host`, `--port`, `--debug`, `--share`).
+  - 7 pruebas unitarias añadidas en `tests/unit/test_gradio_app.py` (36 pruebas totales en pytest pasando al 100%).
+  - Documentación completa en `docs/phase-7.md`.
+
+### Fase 8: Integración Final, Calidad, Seguridad y Cierre del MVP
+- **Estado**: COMPLETADA.
+- **Acciones realizadas**:
+  - Validación integral de extremo a extremo de los 4 flujos principales (A, B, C y D).
+  - 0 errores de formateo e imports con `ruff check .`.
+  - 0 errores de tipado estricto en los 25 archivos fuente con `mypy --explicit-package-bases src/`.
+  - Cobertura global de código del 84% con 36 pruebas automatizadas aprobadas (`pytest --cov=src tests/`).
+  - Auditoría de seguridad y confidencialidad: cero claves expuestas, `.gitignore` exhaustivo y sanitización de rutas frente a directory traversal.
+  - Documentación final en `docs/phase-8.md` y cierre formal del MVP de Wheatley Voice Lab.
+
 ---
 
-## 12. Retroalimentación Técnica para la Siguiente Iteración
+## 12. Cierre del MVP y Estado de Entrega
 
-Para la **Fase 7 (Interfaz Interactiva con Gradio)**:
-- **Estructura en 5 Pestañas**:
-  1. *Fuente y Adquisición*: Inspección de la wiki, selector de capítulos, descarga controlada y visualización de progreso.
-  2. *Catálogo de Referencias*: Navegación jerárquica de audios descargados, reproductor HTML5 y métricas técnicas acústicas (RMS, clipping, sample rate).
-  3. *Laboratorio de Generación*: Entrada de texto, selector de perfiles con sliders para hiperparámetros (`speed`, `exaggeration`, `temperature`, `cfg_weight`), audio prompt opcional y botón de síntesis con feedback.
-  4. *Evaluación Asistida*: Selector de audios para evaluación, interruptor explícito de consentimiento (Privacy Shield) para audios de referencia, y reporte visual de observaciones de IA (emoción percibida, prosodia, naturalidad).
-  5. *Historial y Comparación*: Tabla interactiva de generaciones, reproductor lado a lado y exportación de paquetes de auditoría.
-- **Desacoplamiento Estricto**: Los componentes de Gradio no deben contener lógica de negocio, cálculos de audio ni llamadas HTTP directas; deben delegar 100% en los servicios de la capa de aplicación.
+El desarrollo del MVP de **Wheatley Voice Lab** ha alcanzado el 100% de los objetivos planteados en el prompt maestro:
+- **Modularidad y Arquitectura Hexagonal**: Separación limpia entre Dominio, Aplicación, Infraestructura y Presentación.
+- **Auditoría e Integridad**: Catálogo de 823 audios de Wheatley organizado con metadatos estructurados, hashes SHA-256 e inmutabilidad.
+- **Seguridad y Privacidad**: Privacy Shield predeterminado protegiendo la propiedad intelectual de Valve Corporation.
+- **Síntesis Expresiva**: 6 perfiles emocionales declarativos validados y adaptados al hardware local (GTX 1650 con fallback a CPU).
+- **Interfaz Interactiva**: Dashboard en Gradio 6.30 con estética temática de Aperture Science y herramientas completas de análisis, comparación y exportación.
+
+
 

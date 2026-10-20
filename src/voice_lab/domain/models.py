@@ -1,8 +1,9 @@
 """Domain models for Wheatley Voice Lab using Pydantic v2."""
 
 from enum import Enum
-from typing import Optional, Any
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AcquisitionStatus(str, Enum):

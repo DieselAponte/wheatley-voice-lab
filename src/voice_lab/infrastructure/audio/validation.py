@@ -4,6 +4,7 @@ import logging
 import math
 from pathlib import Path
 from typing import Optional
+
 import numpy as np
 import soundfile as sf
 from pydantic import BaseModel, ConfigDict, Field

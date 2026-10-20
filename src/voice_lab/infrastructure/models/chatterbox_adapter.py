@@ -1,9 +1,9 @@
 """Chatterbox synthesis adapter for Spanish (es-ES) speech generation with device management."""
 
 import logging
-import math
 from pathlib import Path
 from typing import Any, Optional
+
 import numpy as np
 import soundfile as sf
 
@@ -32,8 +32,8 @@ class ChatterboxAdapter(SpeechGenerator):
     def _check_chatterbox_available(self) -> bool:
         """Check if torch and chatterbox are installed in the active environment."""
         try:
-            import torch  # noqa: F401
             import chatterbox  # noqa: F401
+            import torch  # noqa: F401
             return True
         except ImportError:
             return False

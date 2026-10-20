@@ -2,9 +2,9 @@
 
 import json
 import logging
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
+
 from google import genai
 from google.genai import types
 
@@ -94,9 +94,10 @@ Analiza este audio y devuelve un JSON estricto con las siguientes propiedades:
         )
 
         logger.info(f"Invoking Gemini ({self.model_name}) for audio {audio_id} ({len(audio_bytes)} bytes)")
+        contents_payload: Any = [audio_part, prompt_text]
         response = self.client.models.generate_content(
             model=self.model_name,
-            contents=[audio_part, prompt_text],
+            contents=contents_payload,
             config=config,
         )
 

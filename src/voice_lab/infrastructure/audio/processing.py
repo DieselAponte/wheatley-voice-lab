@@ -3,6 +3,7 @@
 import logging
 from pathlib import Path
 from typing import Optional
+
 import numpy as np
 import soundfile as sf
 from pydantic import BaseModel, ConfigDict
@@ -60,7 +61,6 @@ class AudioProcessor:
             data = np.mean(data, axis=1, keepdims=True)
 
         # Resample if needed
-        channels = 1 if mono else data.shape[1]
         if sr != target_sample_rate:
             # Resample using librosa if sample rate changes
             import librosa

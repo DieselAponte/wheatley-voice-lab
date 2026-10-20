@@ -1,14 +1,16 @@
 """Unit tests for GenerationService, JsonGenerationRepository, and ComparisonService."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from src.voice_lab.application.comparison_service import ComparisonService
 from src.voice_lab.application.generation_service import GenerationService
-from src.voice_lab.domain.generation_models import GenerationRecord
 from src.voice_lab.domain.profiles import ProfileManager
 from src.voice_lab.infrastructure.models.chatterbox_adapter import ChatterboxAdapter
-from src.voice_lab.infrastructure.persistence.json_generation_repository import JsonGenerationRepository
+from src.voice_lab.infrastructure.persistence.json_generation_repository import (
+    JsonGenerationRepository,
+)
 
 
 def test_generation_phrase_success(tmp_path):

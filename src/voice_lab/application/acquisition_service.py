@@ -2,7 +2,6 @@
 
 import logging
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, Optional
 
 from src.voice_lab.domain.contracts import ReferenceRepository
@@ -123,25 +122,28 @@ class AcquisitionService:
         if limit is not None and limit > 0:
             candidates = candidates[:limit]
 
-        results = {
-            "total_candidates": len(candidates),
-            "dry_run": dry_run,
-            "downloaded": 0,
-            "skipped": 0,
-            "failed": 0,
-            "items": [],
-        }
+        downloaded = 0
+        skipped = 0
+        failed = 0
+        processed_items: list[ReferenceAudio] = []
 
         for item in candidates:
             res = self.download_audio(item, dry_run=dry_run, force=force)
-            results["items"].append(res)
+            processed_items.append(res)
             if dry_run:
-                results["skipped"] += 1
+                skipped += 1
             elif res.status == AcquisitionStatus.DOWNLOADED:
-                results["downloaded"] += 1
+                downloaded += 1
             elif res.status == AcquisitionStatus.FAILED:
-                results["failed"] += 1
+                failed += 1
             else:
-                results["skipped"] += 1
+                skipped += 1
 
-        return results
+        return {
+            "total_candidates": len(candidates),
+            "dry_run": dry_run,
+            "downloaded": downloaded,
+            "skipped": skipped,
+            "failed": failed,
+            "items": processed_items,
+        }

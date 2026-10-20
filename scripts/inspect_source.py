@@ -8,9 +8,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.voice_lab.infrastructure.config.settings import settings
+from src.voice_lab.infrastructure.persistence.json_reference_repository import (
+    JsonReferenceRepository,
+)
 from src.voice_lab.infrastructure.wiki.http_client import WikiHttpClient
 from src.voice_lab.infrastructure.wiki.parser import WikiParser
-from src.voice_lab.infrastructure.persistence.json_reference_repository import JsonReferenceRepository
 
 
 def inspect_source(
