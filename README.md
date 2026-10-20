@@ -156,7 +156,7 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 | **1** | **Modelado del dominio y adquisición de estructura** | **COMPLETADA** | Modelos Pydantic v2, contratos de repositorio, cliente HTTP resiliente con tenacity, parser BeautifulSoup4 de ToC y audios, tests offline y CLI inspect. |
 | **2** | **Descarga controlada y organización jerárquica** | **COMPLETADA** | Downloader resiliente con rate-limit, SHA-256, jerarquía de directorios por capítulo, modo dry-run y persistencia JSON. |
 | **3** | **Validación, inspección técnica y catálogo** | **COMPLETADA** | Analizador acústico determinista (SoundFile/Librosa), estados de integridad, derivados inmutables y estadísticas por sección. |
-| **4** | Evaluación expresiva con Gemini API | *Pendiente* | Contrato `AudioEvaluator`, adaptador para `google-genai`, control de consentimiento para envío de referencias, caché y pruebas con mocks. |
+| **4** | **Evaluación expresiva con Gemini API** | **COMPLETADA** | Contrato `AudioEvaluator`, adaptador `google-genai`, Privacy Shield para referencias de Valve, caché persistente y mock offline. |
 | **5** | Integración de Chatterbox y perfiles expresivos | *Pendiente* | Diagnóstico de API de Chatterbox, gestión de recursos GPU/CPU (GTX 1650), definición de perfiles JSON y generación base. |
 | **6** | Servicio de generación, persistencia y comparación | *Pendiente* | Orquestación de casos de uso, persistencia de metadatos de generación, historial reproducible y exportación selectiva. |
 | **7** | Interfaz interactiva con Gradio | *Pendiente* | UI con 5 pestañas conectadas a servicios de aplicación, sin lógica de negocio en la vista y con indicadores claros de estado. |
@@ -173,9 +173,8 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 - [x] **Pruebas unitarias de adquisición**: Pruebas offline mediante fixtures HTML locales con 100% de éxito.
 - [x] **Descargador resiliente con rate-limiting**: Gestión de reintentos, validación de contenido, modo dry-run y cálculo SHA-256.
 - [x] **Organización jerárquica de ficheros**: Estructura de carpetas en disco reflejando los capítulos sanitizados para Windows.
-- [x] **Analizador acústico determinista**: Extracción de duración, frecuencia, canales, RMS, silencios, clipping y gestión de derivados.
-- [ ] **Adaptador de evaluación Gemini**: Integración con el SDK `google-genai` con esquemas estructurados de prosodia y transcripción.
-- [ ] **Control de privacidad de referencias**: Mecanismo de bloqueo por defecto antes de transmitir audios protegidos a la API externa.
+- [x] **Adaptador de evaluación Gemini**: Integración con el SDK `google-genai` con esquemas estructurados de prosodia y transcripción.
+- [x] **Control de privacidad de referencias**: Privacy Shield por defecto que bloquea el envío de audios de Valve a proveedores externos sin consentimiento explícito.
 - [ ] **Adaptador de síntesis Chatterbox**: Envoltorio sobre Chatterbox Multilingual (es-ES) con soporte para aceleración o CPU fallback.
 - [ ] **Catálogo de perfiles expresivos**: Configuración declarativa con rangos validados para los estilos requeridos.
 - [ ] **Servicio de orquestación de generación**: Generación individual y por lotes con persistencia de parámetros reproducibles.
@@ -293,12 +292,21 @@ git status
   - Suite de pruebas unitarias en `tests/unit/test_audio_validation.py` (17 pruebas totales pasando).
   - Inspección técnica real ejecutada sobre las referencias descargadas (100% validadas, 7.29s totales).
 
+### Fase 4: Evaluación Expresiva Mediante la API de Gemini
+- **Estado**: COMPLETADA.
+- **Acciones realizadas**:
+  - Modelo tipado `AudioEvaluation` en Pydantic v2 y protocolo `AudioEvaluator`.
+  - Adaptador `GeminiAudioEvaluator` con SDK oficial `google-genai` (2.31.0) con estructuración JSON forzada.
+  - Evaluador de pruebas `MockAudioEvaluator` claramente diferenciado de las evaluaciones reales de IA.
+  - `EvaluationService` con caché persistente indexada por hash de audio, modelo y versión de prompt.
+  - Privacy Shield activo que bloquea por defecto la transmisión de audios protegidos de Valve hacia servidores externos.
+  - Script CLI `scripts/evaluate_audio.py` y suite de pruebas en `tests/unit/test_evaluation.py` (21 pruebas pasando).
+
 ---
 
 ## 12. Retroalimentación Técnica para la Siguiente Iteración
 
-Para la **Fase 4 (Evaluación expresiva mediante la API de Gemini)**:
-- **SDK oficial `google-genai`**: Utilizar `from google import genai; client = genai.Client()`.
-- **Privacidad y Opt-In**: Mantener por defecto `allow_reference_external_eval = False` para proteger audios de Valve contra transmisión desatendida.
-- **Caché determinista**: Indexar evaluaciones por hash SHA-256 del audio + identificador del modelo + versión del prompt del evaluador.
-- **Pruebas con Mock**: Proveer `MockAudioEvaluator` para que la suite de pruebas unitarias corra sin necesidad de API key ni saldo.
+Para la **Fase 5 (Integración real de Chatterbox y perfiles expresivos)**:
+- **Gestión de hardware (GTX 1650 4GB)**: El adaptador de Chatterbox debe inicializarse con detección de CUDA y fallback automático a CPU (`device = "cuda" if torch.cuda.is_available() and free_vram > 3.5GB else "cpu"`).
+- **Perfiles expresivos declarativos**: Diseñar `configs/emotion_profiles.json` con los 6 estilos (Conversacional, Entusiasmado, Confundido, Enfadado, Nervioso, Sarcástico) mapeando parámetros validados (`exaggeration`, `cfg_weight`, `speed`, `temperature`).
+- **Especificación de entrenamiento/fine-tuning**: Siguiendo las directrices del usuario, no se ejecutará entrenamiento desatendido pesado; se detallarán los comandos CLI de entrenamiento y las consideraciones previas en la documentación técnica de la fase.

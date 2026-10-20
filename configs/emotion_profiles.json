@@ -1,0 +1,150 @@
+{
+  "version": "1.0.0",
+  "description": "Perfiles expresivos declarativos para la síntesis de voz del personaje Wheatley.",
+  "profiles": [
+    {
+      "id": "conversacional",
+      "name": "Conversacional",
+      "description": "Tono relajado, explicativo y estándar.",
+      "expressive_intent": "Ritmo moderado, cadencia equilibrada y entonación coloquial.",
+      "parameters": {
+        "exaggeration": 0.25,
+        "cfg_weight": 0.5,
+        "speed": 1.0,
+        "temperature": 0.65
+      },
+      "parameter_bounds": {
+        "exaggeration": [0.0, 1.0],
+        "cfg_weight": [0.1, 1.5],
+        "speed": [0.7, 1.5],
+        "temperature": [0.2, 1.2]
+      },
+      "recommended_phrases": [
+        "Vale, mira, te diré la verdad. No es tan complicado.",
+        "Hola, ¿puedes oírme bien? Creo que este canal funciona.",
+        "De acuerdo, paso a paso, ya sabes cómo va esto."
+      ],
+      "notes": "Perfil base de referencia para contrastar con estilos más extremos."
+    },
+    {
+      "id": "entusiasmado",
+      "name": "Entusiasmado",
+      "description": "Euforia repentina, optimismo desmedido y dinamismo.",
+      "expressive_intent": "Tempo acelerado, énfasis tonal en vocales y cambios de tono ascendentes.",
+      "parameters": {
+        "exaggeration": 0.85,
+        "cfg_weight": 0.75,
+        "speed": 1.18,
+        "temperature": 0.85
+      },
+      "parameter_bounds": {
+        "exaggeration": [0.5, 1.0],
+        "cfg_weight": [0.3, 1.5],
+        "speed": [0.9, 1.6],
+        "temperature": [0.5, 1.3]
+      },
+      "recommended_phrases": [
+        "¡Ja! ¡Sabía que lo conseguirías! ¡Eres una auténtica genio!",
+        "¡Mira eso! ¡Ha funcionado a la primera! ¡Absolutamente brillante!",
+        "¡Adelante, adelante! ¡Este plan es infalible!"
+      ],
+      "notes": "Parámetro exaggeration alto para enfatizar la inflexión hiperbólica."
+    },
+    {
+      "id": "confundido",
+      "name": "Confundido",
+      "description": "Desconcierto, titubeos, dudas y vacilación constante.",
+      "expressive_intent": "Pausas irregulares, tono interrogativo final y velocidad ligeramente ralentizada.",
+      "parameters": {
+        "exaggeration": 0.55,
+        "cfg_weight": 0.45,
+        "speed": 0.92,
+        "temperature": 0.9
+      },
+      "parameter_bounds": {
+        "exaggeration": [0.2, 0.9],
+        "cfg_weight": [0.1, 1.2],
+        "speed": [0.6, 1.2],
+        "temperature": [0.4, 1.4]
+      },
+      "recommended_phrases": [
+        "Espera... ¿qué era eso? Juraría que ese botón hacía otra cosa...",
+        "Mmm... ¿por qué parpadea en rojo? No debería parpadear en rojo, ¿verdad?",
+        "Un momento, ¿dónde estamos exactamente? Esto no parece la salida..."
+      ],
+      "notes": "Temperatura alta para permitir variabilidad e irregularidad prosódica."
+    },
+    {
+      "id": "enfadado",
+      "name": "Enfadado",
+      "description": "Frustración contenida, resentimiento, altanería y reproches.",
+      "expressive_intent": "Articulación seca, volumen firme, tempo tajante y menor variabilidad de tono melódico.",
+      "parameters": {
+        "exaggeration": 0.8,
+        "cfg_weight": 0.85,
+        "speed": 1.12,
+        "temperature": 0.55
+      },
+      "parameter_bounds": {
+        "exaggeration": [0.4, 1.0],
+        "cfg_weight": [0.4, 1.8],
+        "speed": [0.8, 1.5],
+        "temperature": [0.2, 1.0]
+      },
+      "recommended_phrases": [
+        "¡Siempre igual! ¡Nunca me escuchas cuando te doy una orden sencilla!",
+        "¿Quién crees que está al mando aquí? ¡Yo dirijo estas instalaciones ahora!",
+        "¡No te atrevas a llamarme tonto! ¡No soy ningún inepto!"
+      ],
+      "notes": "cfg_weight alto para mayor adherencia a la prosodia asertiva y cortante."
+    },
+    {
+      "id": "nervioso",
+      "name": "Nervioso",
+      "description": "Pánico inminente, aceleración descontrolada, tartamudeo y agitación.",
+      "expressive_intent": "Tempo rápido y entrecortado, subidas bruscas de tono y sensación de falta de aire.",
+      "parameters": {
+        "exaggeration": 0.9,
+        "cfg_weight": 0.6,
+        "speed": 1.28,
+        "temperature": 0.95
+      },
+      "parameter_bounds": {
+        "exaggeration": [0.5, 1.0],
+        "cfg_weight": [0.2, 1.5],
+        "speed": [1.0, 1.8],
+        "temperature": [0.5, 1.5]
+      },
+      "recommended_phrases": [
+        "¡Oh Dios mío, oh Dios mío! ¡Va a estallar! ¡Nos quedan segundos!",
+        "Tranquila, estoy tranquilo, no pasa nada... ¡mentira, corre, corre!",
+        "¡No mires abajo, sólo sigue moviéndote antes de que nos alcancen!"
+      ],
+      "notes": "Velocidad máxima configurada para recrear la clásica urgencia cómica del personaje."
+    },
+    {
+      "id": "sarcastico",
+      "name": "Sarcástico",
+      "description": "Ironía condescendiente, falsa cortesía y burla sutil.",
+      "expressive_intent": "Cadencia pausada, alargamiento deliberado de sílabas clave y tono desdeñoso.",
+      "parameters": {
+        "exaggeration": 0.7,
+        "cfg_weight": 0.65,
+        "speed": 0.86,
+        "temperature": 0.6
+      },
+      "parameter_bounds": {
+        "exaggeration": [0.3, 0.95],
+        "cfg_weight": [0.3, 1.4],
+        "speed": [0.65, 1.1],
+        "temperature": [0.3, 1.1]
+      },
+      "recommended_phrases": [
+        "Oh, brillante deducción. Seguro que nadie más habría pensado en eso jamás.",
+        "Vaya, qué sorpresa. Otra puerta cerrada. Quién se lo habría imaginado.",
+        "Felicidades por presionar el botón gigante. Todo un triunfo intelectual."
+      ],
+      "notes": "Tempo lento (speed < 0.9) para permitir el alargamiento irónico de las palabras."
+    }
+  ]
+}
