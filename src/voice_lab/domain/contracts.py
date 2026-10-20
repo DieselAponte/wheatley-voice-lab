@@ -8,6 +8,7 @@ from src.voice_lab.domain.models import (
     ReferenceSection,
 )
 from src.voice_lab.domain.evaluation_models import AudioEvaluation
+from src.voice_lab.domain.generation_models import GenerationRecord
 
 
 @runtime_checkable
@@ -74,4 +75,40 @@ class AudioEvaluator(Protocol):
         expected_transcript: Optional[str] = None,
     ) -> "AudioEvaluation":
         """Evaluate an audio file and return a structured perception report."""
+        ...
+
+
+@runtime_checkable
+class SpeechGenerator(Protocol):
+    """Protocol for expressive speech generation models (Chatterbox, fallbacks, mocks)."""
+
+    def generate(
+        self,
+        text: str,
+        profile_params: dict[str, float],
+        reference_audio_path: Optional[Path] = None,
+        output_path: Optional[Path] = None,
+    ) -> Path:
+        """Synthesize speech audio from text, expressive parameters, and optional audio prompt."""
+        ...
+
+
+@runtime_checkable
+class GenerationRepository(Protocol):
+    """Persistence protocol for synthetic speech generation experiments."""
+
+    def save_generation(self, record: "GenerationRecord") -> None:
+        """Persist a generation metadata record."""
+        ...
+
+    def get_generation_by_id(self, generation_id: str) -> Optional["GenerationRecord"]:
+        """Retrieve a generation record by its unique ID."""
+        ...
+
+    def list_generations(self) -> list["GenerationRecord"]:
+        """List all saved generation records in chronological order."""
+        ...
+
+    def link_evaluation(self, generation_id: str, evaluation_id: str) -> None:
+        """Associate an evaluation ID with a generation record."""
         ...

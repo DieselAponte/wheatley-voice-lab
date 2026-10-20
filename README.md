@@ -157,7 +157,7 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 | **2** | **Descarga controlada y organización jerárquica** | **COMPLETADA** | Downloader resiliente con rate-limit, SHA-256, jerarquía de directorios por capítulo, modo dry-run y persistencia JSON. |
 | **3** | **Validación, inspección técnica y catálogo** | **COMPLETADA** | Analizador acústico determinista (SoundFile/Librosa), estados de integridad, derivados inmutables y estadísticas por sección. |
 | **4** | **Evaluación expresiva con Gemini API** | **COMPLETADA** | Contrato `AudioEvaluator`, adaptador `google-genai`, Privacy Shield para referencias de Valve, caché persistente y mock offline. |
-| **5** | Integración de Chatterbox y perfiles expresivos | *Pendiente* | Diagnóstico de API de Chatterbox, gestión de recursos GPU/CPU (GTX 1650), definición de perfiles JSON y generación base. |
+| **5** | **Integración de Chatterbox y perfiles expresivos** | **COMPLETADA** | Adaptador `ChatterboxAdapter`, 6 perfiles declarativos en JSON, gestión de CPU fallback (GTX 1650 4GB) y comandos de training. |
 | **6** | Servicio de generación, persistencia y comparación | *Pendiente* | Orquestación de casos de uso, persistencia de metadatos de generación, historial reproducible y exportación selectiva. |
 | **7** | Interfaz interactiva con Gradio | *Pendiente* | UI con 5 pestañas conectadas a servicios de aplicación, sin lógica de negocio en la vista y con indicadores claros de estado. |
 | **8** | Integración final, calidad, seguridad y cierre | *Pendiente* | Validación E2E de flujos A, B, C y D, suite completa de pruebas, verificación de seguridad y matriz de aceptación. |
@@ -175,8 +175,8 @@ LOG_LEVEL=INFO                    # Nivel de logging (DEBUG, INFO, WARNING, ERRO
 - [x] **Organización jerárquica de ficheros**: Estructura de carpetas en disco reflejando los capítulos sanitizados para Windows.
 - [x] **Adaptador de evaluación Gemini**: Integración con el SDK `google-genai` con esquemas estructurados de prosodia y transcripción.
 - [x] **Control de privacidad de referencias**: Privacy Shield por defecto que bloquea el envío de audios de Valve a proveedores externos sin consentimiento explícito.
-- [ ] **Adaptador de síntesis Chatterbox**: Envoltorio sobre Chatterbox Multilingual (es-ES) con soporte para aceleración o CPU fallback.
-- [ ] **Catálogo de perfiles expresivos**: Configuración declarativa con rangos validados para los estilos requeridos.
+- [x] **Adaptador de síntesis Chatterbox**: Envoltorio sobre Chatterbox Multilingual (es-ES) con soporte para aceleración o CPU fallback.
+- [x] **Catálogo de perfiles expresivos**: 6 perfiles declarativos en `configs/emotion_profiles.json` con rangos validados.
 - [ ] **Servicio de orquestación de generación**: Generación individual y por lotes con persistencia de parámetros reproducibles.
 - [ ] **Historial y comparador de experimentos**: Comparación lado a lado de frases sintéticas bajo distintos perfiles y parámetros.
 - [ ] **Dashboard interactivo Gradio**: Navegación de catálogo, generación en vivo, evaluación y comparación.
@@ -302,11 +302,19 @@ git status
   - Privacy Shield activo que bloquea por defecto la transmisión de audios protegidos de Valve hacia servidores externos.
   - Script CLI `scripts/evaluate_audio.py` y suite de pruebas en `tests/unit/test_evaluation.py` (21 pruebas pasando).
 
+### Fase 5: Integración Real de Chatterbox y Perfiles Expresivos
+- **Estado**: COMPLETADA.
+- **Acciones realizadas**:
+  - `ProfileManager` y 6 perfiles declarativos en `configs/emotion_profiles.json` (Conversacional, Entusiasmado, Confundido, Enfadado, Nervioso, Sarcástico) con límites y frases de recomendación.
+  - Contrato `SpeechGenerator` y adaptador `ChatterboxAdapter` con gestión de GPU/CPU (GTX 1650 4GB).
+  - Documentación de especificación completa de comandos CLI de entrenamiento, dataset format y LoRA fine-tuning en `docs/phase-5.md` sin ejecución pesada desatendida.
+  - Suite de pruebas unitarias en `tests/unit/test_speech_generation.py` (25 pruebas totales pasando).
+
 ---
 
 ## 12. Retroalimentación Técnica para la Siguiente Iteración
 
-Para la **Fase 5 (Integración real de Chatterbox y perfiles expresivos)**:
-- **Gestión de hardware (GTX 1650 4GB)**: El adaptador de Chatterbox debe inicializarse con detección de CUDA y fallback automático a CPU (`device = "cuda" if torch.cuda.is_available() and free_vram > 3.5GB else "cpu"`).
-- **Perfiles expresivos declarativos**: Diseñar `configs/emotion_profiles.json` con los 6 estilos (Conversacional, Entusiasmado, Confundido, Enfadado, Nervioso, Sarcástico) mapeando parámetros validados (`exaggeration`, `cfg_weight`, `speed`, `temperature`).
-- **Especificación de entrenamiento/fine-tuning**: Siguiendo las directrices del usuario, no se ejecutará entrenamiento desatendido pesado; se detallarán los comandos CLI de entrenamiento y las consideraciones previas en la documentación técnica de la fase.
+Para la **Fase 6 (Servicio de generación, persistencia y comparación de resultados)**:
+- **Orquestación de inferencia**: El servicio `GenerationService` debe coordinar la validación del texto (mínimo 2 caracteres, sanitizado), resolución del perfil, parámetros personalizados y guardado de metadatos completos (`GenerationRecord`).
+- **Historial e Inmutabilidad**: Cada audio generado debe nombrarse con un ID determinista o UUID (`data/generated/gen_<id>.wav`) y su metadato JSON en `data/generated/gen_<id>.json`.
+- **Comparador**: Exponer funciones para contrastar dos o más generaciones de la misma frase, comparando duración, parámetros utilizados y evaluaciones asociadas.
